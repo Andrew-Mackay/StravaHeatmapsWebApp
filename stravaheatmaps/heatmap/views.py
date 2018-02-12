@@ -3,9 +3,14 @@ from registration.backends.simple.views import RegistrationView
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from heatmap.models import UserProfile, Activity, Point
+from heatmap.models import UserProfile, Activity
 from django.views.generic.edit import FormView
 from .forms import GpxUploadForm
+from django.contrib.auth.decorators import login_required
+#import re
+#import xml.etree.ElementTree as ET
+#import gpxpy
+
 
 # Create your views here.
 def index(request):
@@ -18,16 +23,21 @@ def index(request):
     except User.DoesNotExist:
         pass
 
-
-    print(UserProfile.objects.all())
-    print(Activity.objects.all())
-    print(Point.objects.all())
-    userprof = UserProfile.objects.get(id=request.user.id)
-    print(userprof)
-
     return render(request, "index.html", context=context_dict)
 
 
+
+# def parseFile(file):
+#     points = []
+#     for line in file:
+#         if "<trkpt lat=" in str(line):
+#             lat = float(line.split()[1][5:-2])
+#             lng = float(line.split()[2][5:-2])
+#             points.append((lat,lng))
+#
+#     return points
+
+@login_required
 def upload(request):
     form = GpxUploadForm(request.POST, request.FILES)
 
@@ -36,13 +46,12 @@ def upload(request):
         files = request.FILES.getlist('file_field')
         if form.is_valid():
             for f in files:
-                new_activity= Activity.objects.create(creator=userprofile)
-                new_activity.save()
-
-                # parse files
-                # create model
-                print(f)
-
+                Activity.objects.create(creator=userprofile, gpxFile=f).save()
+                # points = parseFile(f)
+                # for point in points:
+                #     Point.objects.create(activity=new_activity, lat=point[0], lng=point[1]).save()
+                #
+                # new_activity.save()
         else:
             print("invalid form")
 
