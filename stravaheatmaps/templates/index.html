@@ -3,8 +3,7 @@
 
 {% if user.is_authenticated %}
 <h1>Welcome {{ userprofile }}</h1>
-<script>console.log("User profile: ", {{ user_profile }});
-console.log("User: ", {{ user }});</script>
+
 {% else %}
 <h1>Welcome to Heatmaps</h1>
 <h3> <a href="/accounts/register">Register</a> an account or <a href="/accounts/login">login</a> to get started</h3>
